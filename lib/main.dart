@@ -55,6 +55,8 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {
       sum += delta;
       _incrementTurn();
+      // set step to 1
+      step = 1;
       if (sum == target) {
         hasWon = true;
       }
@@ -166,12 +168,12 @@ class _StepControlsState extends State<StepControls> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             IconButton(
-              icon: Icon(Icons.exposure_minus_1),
-              onPressed: _decrementStep,
-            ),
-            IconButton(
               icon: Icon(Icons.call_split),
               onPressed: _divideStep,
+            ),
+            IconButton(
+              icon: Icon(Icons.exposure_minus_1),
+              onPressed: _decrementStep,
             ),
             IconButton(
               icon: Icon(Icons.exposure_plus_1),
