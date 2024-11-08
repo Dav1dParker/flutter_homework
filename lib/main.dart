@@ -137,7 +137,7 @@ class _StepControlsState extends State<StepControls> {
 
   void _decrementStep() {
     setState(() {
-      _currentStep = (_currentStep - 1).clamp(1, _currentStep);
+      _currentStep = (_currentStep - 1);
       widget.onStepChange(_currentStep);
     });
   }
