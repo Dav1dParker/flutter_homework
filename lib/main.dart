@@ -63,8 +63,8 @@ class _MovieListScreenState extends State<MovieListScreen> {
               onSubmitted: (_) => _addMovie(),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
+          Flexible(
+            child: ListView.separated(
               itemCount: _movies.length,
               itemBuilder: (context, index) {
                 return ListTile(
@@ -75,6 +75,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                   ),
                 );
               },
+              separatorBuilder: (context, index) => Divider(), // Separator
             ),
           ),
         ],
