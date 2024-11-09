@@ -47,38 +47,37 @@ class _MovieListScreenState extends State<MovieListScreen> {
       appBar: AppBar(
         title: Text('Movie List'),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _controller,
-                decoration: InputDecoration(
-                  labelText: 'Enter movie name',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: _addMovie,
-                  ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'Enter movie name',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: _addMovie,
                 ),
-                onSubmitted: (_) => _addMovie(),
               ),
+              onSubmitted: (_) => _addMovie(),
             ),
-            Column(
-              children: _movies
-                  .asMap()
-                  .entries
-                  .map((entry) => ListTile(
-                title: Text(entry.value),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => _removeMovie(entry.key),
-                ),
-              ))
-                  .toList(),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _movies.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_movies[index]),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () => _removeMovie(index),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
