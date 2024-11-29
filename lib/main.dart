@@ -4,6 +4,9 @@ void main() {
   runApp(CinemaApp());
 }
 
+//global variables
+int selectedMovie = 0;
+
 class CinemaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -76,67 +79,74 @@ class MoviesScreen extends StatelessWidget {
 }
 
 
-class SessionSelectionScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Выбрать фильм')),
-      body: Center(
-        // column with 3 buttons with padding between them
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SeatSelectionScreen()),
-                );
-              },
-              child: const Text('The Matrix'),
-            ),
-            const Padding(padding: EdgeInsets.all(10)),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SeatSelectionScreen()),
-                );
-              },
-              child: const Text('La La Land'),
-            ),
-            const Padding(padding: EdgeInsets.all(10)),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SeatSelectionScreen()),
-                );
-              },
-              child: const Text('Oppenheimer'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+Future<Image> loadPosterImage() {
+  return Future.delayed(
+    const Duration(seconds: 3),
+        () {
+      String url;
+      if (selectedMovie == 0) {
+        url =
+        'https://i.pinimg.com/736x/29/c6/d9/29c6d9314178119ce86099e3c66a328d.jpg';
+      } else {
+        url = 'https://cdn1.ozone.ru/s3/multimedia-v/6698423299.jpg';
+      }
+      return Image.network(url, width: 250, height: 400);
+    },
+  );
+}
+
+Future<Image> loadSeatsImage() async {
+  await Future.delayed(const Duration(seconds: 3));
+  const url = 'https://www.mirage.ru/images/bzal/z183.jpg';
+  return Image.network(url, width: 540, height: 400);
 }
 
 
 
-class SeatSelectionScreen extends StatelessWidget {
+
+class SessionSelectionScreen extends StatefulWidget {
+  @override
+  _SeatSelectionScreenState createState() => _SeatSelectionScreenState();
+}
+
+class _SeatSelectionScreenState extends State<SessionSelectionScreen> {
+  Image? _posterImage;
+  Image? _seatsImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPosterAndSeats();
+  }
+
+  void _loadPosterAndSeats() {
+    // Load poster image using Future API
+    loadPosterImage().then((image) {
+      setState(() {
+        _posterImage = image;
+      });
+    });
+
+    // Load seats image using async/await
+    loadSeatsImage().then((image) {
+      setState(() {
+        _seatsImage = image;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Выбрать место')),
       body: Center(
-        // Image then two fields for row and seat number then confirm button
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            //image in lib/imageZal.png
-            Image.asset('assets/imageZal.png'),
-            const Padding(padding: EdgeInsets.all(10)),
+            if (_posterImage != null) _posterImage! else const CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            if (_seatsImage != null) _seatsImage! else const CircularProgressIndicator(),
+            const SizedBox(height: 20),
             const TextField(
               decoration: InputDecoration(hintText: 'Ряд'),
             ),
@@ -160,6 +170,11 @@ class SeatSelectionScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
 
 
 // cart screen
