@@ -198,32 +198,63 @@ class SessionSelectionScreen extends StatelessWidget {
   }
 }
 
-class SeatSelectionScreen extends StatelessWidget {
+class SeatSelectionScreen extends StatefulWidget {
+  @override
+  _SeatSelectionScreenState createState() => _SeatSelectionScreenState();
+}
+
+class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
+  final TextEditingController _rowController = TextEditingController();
+  final TextEditingController _seatController = TextEditingController();
+
+  @override
+  void dispose() {
+    _rowController.dispose();
+    _seatController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Выбрать место')),
       body: Center(
-        // Image then two fields for row and seat number then confirm button
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            //image in lib/imageZal.png
-            Image.asset('assets/imageZal.png'),
-            const Padding(padding: EdgeInsets.all(10)),
-            const TextField(
-              decoration: InputDecoration(hintText: 'Ряд'),
+            Image.network(
+              'https://www.mirage.ru/images/bzal/z183.jpg',
+              height: 350,
+              width: 350,
+              fit: BoxFit.cover,
             ),
             const Padding(padding: EdgeInsets.all(10)),
-            const TextField(
-              decoration: InputDecoration(hintText: 'Место'),
+            TextField(
+              controller: _rowController,
+              decoration: const InputDecoration(hintText: 'Ряд'),
+              keyboardType: TextInputType.number,
+            ),
+            const Padding(padding: EdgeInsets.all(10)),
+            TextField(
+              controller: _seatController,
+              decoration: const InputDecoration(hintText: 'Место'),
+              keyboardType: TextInputType.number,
             ),
             const Padding(padding: EdgeInsets.all(10)),
             ElevatedButton(
               onPressed: () {
+                int row = int.tryParse(_rowController.text) ?? 0;
+                int seat = int.tryParse(_seatController.text) ?? 0;
+
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CartScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => SeatData(
+                      row: row,
+                      seat: seat,
+                      child: CartScreen(),
+                    ),
+                  ),
                 );
               },
               child: const Text('Добавить в корзину'),
@@ -235,27 +266,63 @@ class SeatSelectionScreen extends StatelessWidget {
   }
 }
 
-// cart screen
+
+
+class SeatData extends InheritedWidget {
+  final int row;
+  final int seat;
+
+  const SeatData({
+    Key? key,
+    required this.row,
+    required this.seat,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  static SeatData? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<SeatData>();
+  }
+
+  @override
+  bool updateShouldNotify(covariant SeatData oldWidget) {
+    return row != oldWidget.row || seat != oldWidget.seat;
+  }
+}
+
+
 class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final seatData = SeatData.of(context);
+    final int srow = seatData?.row ?? 0;
+    final int sseat = seatData?.seat ?? 0;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Корзина')),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => BookingConfirmationScreen()),
-            );
-          },
-          child: const Text('Оплатить'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('Выбрано место: ряд $srow, место $sseat'),
+            const Padding(padding: EdgeInsets.all(10)),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookingConfirmationScreen(),
+                  ),
+                );
+              },
+              child: const Text('Оплатить'),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
 
 class BookingConfirmationScreen extends StatelessWidget {
   @override
