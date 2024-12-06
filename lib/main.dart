@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +15,6 @@ class CinemaApp extends StatelessWidget {
     );
   }
 }
-
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -55,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-
 class MoviesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -75,45 +74,122 @@ class MoviesScreen extends StatelessWidget {
   }
 }
 
-
 class SessionSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Выбрать фильм')),
       body: Center(
-        // column with 3 buttons with padding between them
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: ListView(
           children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SeatSelectionScreen()),
-                );
-              },
-              child: const Text('The Matrix'),
+            // First movie
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Container(
+                    height: 500,
+                    width: 300,
+                    child: CachedNetworkImage(
+                      imageUrl:
+                          'https://avatars.mds.yandex.net/get-kinopoisk-image/1946459/afa2cfdb-3cdc-4daf-961c-134a68533d30/orig',
+                      progressIndicatorBuilder:
+                          (context, url, downloadProgress) =>
+                              const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Матрица', style: TextStyle(fontSize: 20)),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SeatSelectionScreen()),
+                          );
+                        },
+                        child: const Text('Купить'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const Padding(padding: EdgeInsets.all(10)),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SeatSelectionScreen()),
-                );
-              },
-              child: const Text('La La Land'),
+            // Second movie
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Container(
+                    height: 500,
+                    width: 300,
+                    child: Image.network(
+                      'https://avatars.mds.yandex.net/get-kinopoisk-image/1946459/b9f543bb-c955-49ce-8d71-0ab5b81a40ed/orig',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Скотт Пилигрим против всех', style: TextStyle(fontSize: 20)),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SeatSelectionScreen()),
+                          );
+                        },
+                        child: const Text('Купить'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const Padding(padding: EdgeInsets.all(10)),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SeatSelectionScreen()),
-                );
-              },
-              child: const Text('Oppenheimer'),
+            // Third movie
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Container(
+                    height: 500,
+                    width: 300,
+                    child: CachedNetworkImage(
+                      imageUrl:
+                          'https://avatars.mds.yandex.net/get-kinopoisk-image/1946459/afa2cfdb-3cdc-4daf-961c-134a68533d30/orig',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Фильм 3', style: TextStyle(fontSize: 20)),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SeatSelectionScreen()),
+                          );
+                        },
+                        child: const Text('Купить'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -121,8 +197,6 @@ class SessionSelectionScreen extends StatelessWidget {
     );
   }
 }
-
-
 
 class SeatSelectionScreen extends StatelessWidget {
   @override
@@ -161,7 +235,6 @@ class SeatSelectionScreen extends StatelessWidget {
   }
 }
 
-
 // cart screen
 class CartScreen extends StatelessWidget {
   @override
@@ -173,7 +246,8 @@ class CartScreen extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => BookingConfirmationScreen()),
+              MaterialPageRoute(
+                  builder: (context) => BookingConfirmationScreen()),
             );
           },
           child: const Text('Оплатить'),
@@ -182,8 +256,6 @@ class CartScreen extends StatelessWidget {
     );
   }
 }
-
-
 
 class BookingConfirmationScreen extends StatelessWidget {
   @override
@@ -213,6 +285,3 @@ class BookingConfirmationScreen extends StatelessWidget {
     );
   }
 }
-
-
-
