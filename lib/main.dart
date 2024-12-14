@@ -1,9 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 void main() {
+  setup();
   runApp(CinemaApp());
 }
+
 
 class CinemaApp extends StatelessWidget {
   @override
@@ -54,6 +57,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+void setup() {
+  GetIt getIt = GetIt.instance;
+  getIt.registerSingleton<CartData>(CartData(amount: 0, row: 0, seat: 0));
+}
+
+
 
 class MoviesScreen extends StatelessWidget {
   @override
@@ -290,12 +300,21 @@ class SeatData extends InheritedWidget {
 }
 
 
+class CartData{
+  int amount;
+  int row;
+  int seat;
+
+  CartData({required this.amount, required this.row, required this.seat});
+}
+
+
 class CartScreen extends StatelessWidget {
+  final TextEditingController _amountController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    final seatData = SeatData.of(context);
-    final int srow = seatData?.row ?? 0;
-    final int sseat = seatData?.seat ?? 0;
+    final cartData = GetIt.instance<CartData>();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Корзина')),
@@ -303,10 +322,20 @@ class CartScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Выбрано место: ряд $srow, место $sseat'),
+            Text('Выбрано место: ряд 1, место 2'),
+            const Padding(padding: EdgeInsets.all(10)),
+            TextField(
+              controller: _amountController,
+              decoration: const InputDecoration(hintText: 'Количество билетов'),
+              keyboardType: TextInputType.number,
+            ),
             const Padding(padding: EdgeInsets.all(10)),
             ElevatedButton(
               onPressed: () {
+                final int amount =
+                    int.tryParse(_amountController.text) ?? 0;
+                cartData.amount = amount;
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -324,15 +353,21 @@ class CartScreen extends StatelessWidget {
 }
 
 
+
 class BookingConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final cartData = GetIt.instance<CartData>();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Оплата подтверждена')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text("Выбрано место: ряд 1, место 2"),
+            Text("Количество билетов: ${cartData.amount}"),
+            const Padding(padding: EdgeInsets.all(10)),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -352,3 +387,4 @@ class BookingConfirmationScreen extends StatelessWidget {
     );
   }
 }
+
