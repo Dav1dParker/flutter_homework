@@ -1,25 +1,30 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_homework/cart_store.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 
+final cartStore = CartStore();
+
 void main() {
-  setup();
   runApp(CinemaApp());
 }
-
 
 class CinemaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Кинотеатр',
+      title: 'Cinema Tickets App',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: HomeScreen(),
     );
   }
 }
 
+
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -66,6 +71,8 @@ void setup() {
 
 
 class MoviesScreen extends StatelessWidget {
+  const MoviesScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,6 +92,8 @@ class MoviesScreen extends StatelessWidget {
 }
 
 class SessionSelectionScreen extends StatelessWidget {
+  const SessionSelectionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,7 +106,7 @@ class SessionSelectionScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 500,
                     width: 300,
                     child: CachedNetworkImage(
@@ -137,7 +146,7 @@ class SessionSelectionScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 500,
                     width: 300,
                     child: Image.network(
@@ -171,7 +180,7 @@ class SessionSelectionScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 500,
                     width: 300,
                     child: CachedNetworkImage(
@@ -208,66 +217,38 @@ class SessionSelectionScreen extends StatelessWidget {
   }
 }
 
-class SeatSelectionScreen extends StatefulWidget {
-  @override
-  _SeatSelectionScreenState createState() => _SeatSelectionScreenState();
-}
-
-class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
+class SeatSelectionScreen extends StatelessWidget {
   final TextEditingController _rowController = TextEditingController();
   final TextEditingController _seatController = TextEditingController();
 
   @override
-  void dispose() {
-    _rowController.dispose();
-    _seatController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Выбрать место')),
+      appBar: AppBar(title: const Text('Select Seat')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.network(
-              'https://www.mirage.ru/images/bzal/z183.jpg',
-              height: 350,
-              width: 350,
-              fit: BoxFit.cover,
-            ),
-            const Padding(padding: EdgeInsets.all(10)),
             TextField(
               controller: _rowController,
-              decoration: const InputDecoration(hintText: 'Ряд'),
+              decoration: const InputDecoration(hintText: 'Enter row'),
               keyboardType: TextInputType.number,
             ),
-            const Padding(padding: EdgeInsets.all(10)),
+            const SizedBox(height: 10),
             TextField(
               controller: _seatController,
-              decoration: const InputDecoration(hintText: 'Место'),
+              decoration: const InputDecoration(hintText: 'Enter seat'),
               keyboardType: TextInputType.number,
             ),
-            const Padding(padding: EdgeInsets.all(10)),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                int row = int.tryParse(_rowController.text) ?? 0;
-                int seat = int.tryParse(_seatController.text) ?? 0;
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SeatData(
-                      row: row,
-                      seat: seat,
-                      child: CartScreen(),
-                    ),
-                  ),
-                );
+                final int row = int.tryParse(_rowController.text) ?? 0;
+                final int seat = int.tryParse(_seatController.text) ?? 0;
+                cartStore.updateSeat(row, seat);
+                Navigator.pop(context);
               },
-              child: const Text('Добавить в корзину'),
+              child: const Text('Confirm'),
             ),
           ],
         ),
@@ -278,16 +259,17 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
 
 
 
+
 class SeatData extends InheritedWidget {
   final int row;
   final int seat;
 
   const SeatData({
-    Key? key,
+    super.key,
     required this.row,
     required this.seat,
-    required Widget child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   static SeatData? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<SeatData>();
@@ -314,36 +296,34 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cartData = GetIt.instance<CartData>();
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Корзина')),
+      appBar: AppBar(title: const Text('Cart')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Выбрано место: ряд 1, место 2'),
-            const Padding(padding: EdgeInsets.all(10)),
+            Observer(
+              builder: (_) => Text(
+                'Selected Seat: Row ${cartStore.row}, Seat ${cartStore.seat}',
+              ),
+            ),
+            const SizedBox(height: 10),
             TextField(
               controller: _amountController,
-              decoration: const InputDecoration(hintText: 'Количество билетов'),
+              decoration: const InputDecoration(hintText: 'Enter ticket amount'),
               keyboardType: TextInputType.number,
             ),
-            const Padding(padding: EdgeInsets.all(10)),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                final int amount =
-                    int.tryParse(_amountController.text) ?? 0;
-                cartData.amount = amount;
-
+                final int amount = int.tryParse(_amountController.text) ?? 0;
+                cartStore.updateAmount(amount);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => BookingConfirmationScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => BookingConfirmationScreen()),
                 );
               },
-              child: const Text('Оплатить'),
+              child: const Text('Checkout'),
             ),
           ],
         ),
@@ -351,40 +331,35 @@ class CartScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 
 class BookingConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final cartData = GetIt.instance<CartData>();
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Оплата подтверждена')),
+      appBar: AppBar(title: const Text('Booking Confirmed')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("Выбрано место: ряд 1, место 2"),
-            Text("Количество билетов: ${cartData.amount}"),
-            const Padding(padding: EdgeInsets.all(10)),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Назад'),
-            ),
-            const Padding(padding: EdgeInsets.all(10)),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              child: const Text('На главный экран'),
-            ),
-          ],
+        child: Observer(
+          builder: (_) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('Selected Seat: Row ${cartStore.row}, Seat ${cartStore.seat}'),
+              Text('Tickets: ${cartStore.amount}'),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Back'),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
 
